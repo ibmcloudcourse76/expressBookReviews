@@ -51,30 +51,41 @@ regd_users.post("/login", (req,res) => {
 });
 
 // Add a book review
-regd_users.put("/auth/review/:isbn", (req, res) => {
+regd_users.put("/auth/review/:isbn/:review", (req, res) => {
     const isbn = req.params.isbn;
-    let book = books[isbn];
-    let reviews = book["reviews"];
-    let userName = req.session.authorization.username;
-    let reviewExists = false;
+    const review = req.params.review;
+    let strReturnMessage = "isbn not existing";
 
-    let keys = Object.keys(reviews);
-    for (let i = 0; i < keys.length; i++) {
-        if (reviews[keys[i]]["user"] === userName){
-            reviews[keys[i]]["review"] = "FirstReview";
-            reviewExists = true;
+    if (books[isbn]){
+        let reviews = books[isbn]["reviews"];
+        let userName = req.session.authorization.username;
+
+        // Only add or update if a review is provided
+        if (review){
+            reviews[userName] = review;
+            books[isbn]["reviews"] = reviews;
         }
-      } 
 
-      if (!reviewExists){
-        //reviews
-      }
+        strReturnMessage = books[isbn]["reviews"];
+    }
 
+    res.send(strReturnMessage);
+});
 
+// Add a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+    let strReturnMessage = "isbn not existing";
 
-    res.send(req.session.authorization.username);
+    if (books[isbn]){
+        let userName = req.session.authorization.username;
 
-    //req.session.authorization
+        delete books[isbn]["reviews"][userName];
+
+        strReturnMessage = books[isbn]["reviews"];
+    }
+
+    res.send(strReturnMessage);
 });
 
 module.exports.authenticated = regd_users;

@@ -64,10 +64,13 @@ public_users.get('/title/:title',function (req, res) {
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
     const isbn = req.params.isbn;
-    let book = books[isbn];
-    let reviews = book["reviews"];
+    let strReturnMessage = "isbn not existing";
 
-    res.send(reviews);
+    if (books[isbn] != null){
+        strReturnMessage = books[isbn]["reviews"];
+    }
+
+    res.send(strReturnMessage);
 });
 
 module.exports.general = public_users;
